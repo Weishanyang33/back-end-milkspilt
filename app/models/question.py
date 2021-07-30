@@ -14,6 +14,18 @@ class Question(db.Model):
     question_votes = db.relationship('Question_Vote', backref = 'question', lazy = 'dynamic')
     
     
+    def to_dict(self):
+        return {
+            "question_id": self.question_id,
+            "author_id": self.author_id,
+            "title": self.title,
+            "content": self.content,
+            "age": self.age_tag,
+            "category": self.cat_tag,
+            "views": self.views,
+            "date_asked": self.date_asked
+        }
+        
     def to_json(self,answer,vote):
         return {
             "question_id": self.question_id,
@@ -24,6 +36,20 @@ class Question(db.Model):
             "category": self.cat_tag,
             "views": self.views,
             "date_asked": self.date_asked,
-            "answer": len(answer),
+            "answer": answer,
             "vote": len(vote)
+        }
+        
+    def to_json_detail(self,answer,vote):
+        return {
+            "question_id": self.question_id,
+            "author_id": self.author_id,
+            "title": self.title,
+            "content": self.content,
+            "age": self.age_tag,
+            "category": self.cat_tag,
+            "views": self.views,
+            "date_asked": self.date_asked,
+            "answer": answer,
+            "vote": vote
         }

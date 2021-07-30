@@ -32,10 +32,24 @@ def get_question():
     for question in questions:
         answers = Answer.query.filter_by(question_id=question.question_id).all()
         votes = Question_Vote.query.filter_by(question_id=question.question_id).all()
-        answer_list = [answer for answer in answers]
+        answer_list = [answer.answer_id for answer in answers]
         vote_list = [vote for vote in votes]
-    question_response = [question.to_json(answer_list, vote_list) for question in questions]
+    question_response = [question.to_json_detail(answer_list, vote_list) for question in questions]
     return jsonify(question_response), 200
+
+# get question by id
+@questions_bp.route("/<question_id>", methods=["GET"], strict_slashes=False)
+def get_one_question(question_id):
+    question = Question.query.get(question_id)
+    answers = Answer.query.filter_by(question_id=question.question_id).all()
+    answer_list = [answer.answer_id for answer in answers]
+    votes = Question_Vote.query.filter_by(question_id=question.question_id).all()
+    vote_list = [vote.author_id for vote in votes]
+    if question:
+        question_response = question.to_json_detail(answer_list, vote_list)
+        return jsonify(question_response), 200
+    else:
+        return jsonify(None), 404
 
 # post a question
 @questions_bp.route("", methods=["POST"], strict_slashes=False)
@@ -51,7 +65,29 @@ def ask_question():
         db.session.add(new_question)
         db.session.commit()
         return {
-                "question": new_question.to_json()
+                "question": new_question.to_dict()
         }, 201
     else:
         return {"error": "Invalid data"}, 400
+
+# answer a question   
+@questions_bp.route("/<question_id>/answer", methods=["POST"], strict_slashes=False)
+def answer_question(question_id):
+    question = Question.query.get(question_id)
+    # current_user = session['user']
+    if not question:
+        return jsonify({
+            "error": 'Question doesn\'t exist'
+        }), 404
+    request_body = request.get_json()
+    if "content" in request_body:
+        new_answer = Answer(content=request_body["content"],
+                            question_id=question_id,
+                            author_id=request_body["author_id"])
+        db.session.add(new_answer)
+        db.session.commit()
+        return {
+                "answer": new_answer.to_json()
+        }, 201
+    
+
