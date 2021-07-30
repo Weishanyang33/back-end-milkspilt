@@ -7,7 +7,7 @@ class Question(db.Model):
     content = db.Column(db.String)
     age_tag = db.Column(db.String)
     cat_tag = db.Column(db.String)
-    views = db.Column(db.Integer)
+    views = db.Column(db.Integer, default=0)
     date_asked = db.Column(db.DateTime, nullable=True, default=datetime.utcnow())
     author_id = db.Column(db.Integer, db.ForeignKey('author.author_id'))
     answers = db.relationship('Answer', backref='question', lazy='dynamic')
@@ -36,7 +36,7 @@ class Question(db.Model):
             "category": self.cat_tag,
             "views": self.views,
             "date_asked": self.date_asked,
-            "answer": answer,
+            "answer": len(answer),
             "vote": len(vote)
         }
         

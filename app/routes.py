@@ -14,8 +14,6 @@ load_dotenv()
 questions_bp = Blueprint("questions", __name__, url_prefix="/questions")
 
 
-
-
 # get query params based questions or all questions
 @questions_bp.route("", methods=["GET"], strict_slashes=False)
 def get_question():
@@ -29,24 +27,28 @@ def get_question():
         questions = Question.query.filter_by(cat_tag=cat_query).all()
     else:
         questions = Question.query.all()
+    question_response = []
     for question in questions:
         answers = Answer.query.filter_by(question_id=question.question_id).all()
         votes = Question_Vote.query.filter_by(question_id=question.question_id).all()
         answer_list = [answer.answer_id for answer in answers]
+        print(answer_list)
         vote_list = [vote for vote in votes]
-    question_response = [question.to_json_detail(answer_list, vote_list) for question in questions]
+        question_response.append(question.to_json(answer_list, vote_list))
     return jsonify(question_response), 200
 
 # get question by id
 @questions_bp.route("/<question_id>", methods=["GET"], strict_slashes=False)
 def get_one_question(question_id):
     question = Question.query.get(question_id)
-    answers = Answer.query.filter_by(question_id=question.question_id).all()
+    answers = Answer.query.filter_by(question_id=question_id).all()
     answer_list = [answer.answer_id for answer in answers]
     votes = Question_Vote.query.filter_by(question_id=question.question_id).all()
     vote_list = [vote.author_id for vote in votes]
     if question:
+        question.views += 1
         question_response = question.to_json_detail(answer_list, vote_list)
+        db.session.commit()
         return jsonify(question_response), 200
     else:
         return jsonify(None), 404
@@ -89,5 +91,7 @@ def answer_question(question_id):
         return {
                 "answer": new_answer.to_json()
         }, 201
+    else:
+        return {"error": "Invalid data"}, 400
     
 
