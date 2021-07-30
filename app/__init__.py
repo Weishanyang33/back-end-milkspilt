@@ -6,7 +6,7 @@ import os
 
 from flask import render_template, redirect
 from authlib.integrations.flask_client import OAuth
-# from flask_cors import CORS
+from flask_cors import CORS
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -82,5 +82,5 @@ def create_app():
     app.register_blueprint(questions_bp)
     
     
-    # CORS(app)
+    CORS(app)
     return app
