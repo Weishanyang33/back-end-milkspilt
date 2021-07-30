@@ -13,16 +13,31 @@ load_dotenv()
 ####################### Blueprints ########################
 questions_bp = Blueprint("questions", __name__, url_prefix="/questions")
 
+
+
+
+# get query params based questions or all questions
 @questions_bp.route("", methods=["GET"], strict_slashes=False)
 def get_question():
-    question_query = request.args.get("age")
-    questions = Question.query.all()
-    question_response = []
-    for question in questions: 
-        question_response.append(question.to_json())
+    age_query = request.args.get("age")
+    cat_query = request.args.get("category")
+    if age_query and cat_query:
+        questions = Question.query.filter_by(age_tag=age_query, cat_tag=cat_query).all()
+    elif age_query:
+        questions = Question.query.filter_by(age_tag=age_query).all()
+    elif cat_query:
+        questions = Question.query.filter_by(cat_tag=cat_query).all()
+    else:
+        questions = Question.query.all()
+    for question in questions:
+        answers = Answer.query.filter_by(question_id=question.question_id).all()
+        votes = Question_Vote.query.filter_by(question_id=question.question_id).all()
+        answer_list = [answer for answer in answers]
+        vote_list = [vote for vote in votes]
+    question_response = [question.to_json(answer_list, vote_list) for question in questions]
     return jsonify(question_response), 200
 
-
+# post a question
 @questions_bp.route("", methods=["POST"], strict_slashes=False)
 def ask_question():
     # current_user = session['user']
