@@ -46,7 +46,8 @@ def get_one_question(question_id):
     votes = Question_Vote.query.filter_by(question_id=question.question_id).all()
     vote_list = [vote.author_id for vote in votes]
     if question:
-        question.views += 1
+        # question.views += 1
+        question.views = 0
         question_response = question.to_json_detail(answer_list, vote_list)
         db.session.commit()
         return jsonify(question_response), 200
