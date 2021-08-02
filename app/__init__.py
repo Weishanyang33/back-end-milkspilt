@@ -59,13 +59,13 @@ def create_app():
             new_author = Author(username=user_name, email=user_email, avatar=picture)
             db.session.add(new_author)
             db.session.commit()
-        return redirect('/dashboard')
+        return redirect('http://localhost:3000/dashboard')
 
 
     @app.route('/logout')
     def logout():
         session.pop('user', None)
-        return redirect('/')
+        return redirect('http://localhost:3000')
 
     
     from app.models.author import Author
