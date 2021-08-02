@@ -95,3 +95,18 @@ def answer_question(question_id):
         return {"error": "Invalid data"}, 400
     
 
+@questions_bp.route("/<question_id>", methods=["DELETE"], strict_slashes=False)
+def delete_question(question_id):
+    question = Question.query.get(question_id)
+    if not question:
+        return jsonify({
+            "error": 'Question doesn\'t exist'
+        }), 404
+    db.session.delete(question)
+    db.session.commit()
+    return {
+              "details": f"Question {question.question_id} {question.title} successfully deleted"
+        }
+        
+        
+
