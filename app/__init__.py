@@ -35,7 +35,7 @@ def create_app():
     @app.route('/')
     def homepage():
         user = session.get('user')
-        return render_template('home.html', user=user)
+        return render_template('http://localhost:3000', user=user)
     
     @app.route('/login')
     def login():
@@ -59,7 +59,7 @@ def create_app():
             new_author = Author(username=user_name, email=user_email, avatar=picture)
             db.session.add(new_author)
             db.session.commit()
-        return redirect('/')
+        return redirect('/dashboard')
 
 
     @app.route('/logout')
