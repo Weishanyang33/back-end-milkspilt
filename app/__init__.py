@@ -59,6 +59,9 @@ def create_app():
             new_author = Author(username=user_name, email=user_email, avatar=picture)
             db.session.add(new_author)
             db.session.commit()
+        print(session['user'])
+        print("~~~~~~~")
+        print(current_user)
         return redirect('http://localhost:3000/dashboard')
 
 
