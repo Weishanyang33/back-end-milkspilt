@@ -7,11 +7,38 @@ from app.models.question_vote import Question_Vote
 from app.models.answer_vote import Answer_Vote
 import os
 from dotenv import load_dotenv
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 load_dotenv()
 
 ####################### Blueprints ########################
 questions_bp = Blueprint("questions", __name__, url_prefix="/questions")
+login_bp = Blueprint("login", __name__)
+
+@login_bp.route("/login", methods=["POST"], strict_slashes=False)
+def login():
+    request_body = request.get_json()
+    token = request_body["token"]
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+    request = requests.Request()
+    user = id_token.verify_oauth2_token(token,request,GOOGLE_CLIENT_ID)
+    print('~~~~~')
+    print(user)
+    # session['user'] = user
+    if user["email_verified"]:
+        user_id = user["sub"]
+        user_email = user["email"]
+        picture = user["picture"]
+        user_name = user["given_name"]
+    else:
+        return "User email not available or not verified by Google.", 400
+    current_user = Author.query.filter_by(email=user_email).all()
+    if not current_user:
+        new_author = Author(username=user_name, email=user_email, avatar=picture)
+        db.session.add(new_author)
+        db.session.commit()
+    return jsonify(user), 200
 
 
 # get query params based questions or all questions
