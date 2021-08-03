@@ -39,7 +39,9 @@ def login():
         db.session.add(new_author)
         db.session.commit()
         current_user = Author.query.filter_by(email=user_email).first()
-    return jsonify(current_user), 200
+    return {
+            "current_user": current_user.to_json()
+        }, 201
 
 
 # get query params based questions or all questions

@@ -9,3 +9,11 @@ class Author(db.Model):
     answers = db.relationship('Answer', backref='author', lazy='dynamic')
     question_votes = db.relationship('Question_Vote', backref = 'author', lazy = 'dynamic')
     answer_votes = db.relationship('Answer_Vote', backref = 'author', lazy = 'dynamic')
+    
+    def to_json(self):
+        return {
+            "author_id": self.author_id,
+            "username": self.username,
+            "email": self.email,
+            "avatar": self.avatar
+        }
