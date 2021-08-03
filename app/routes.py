@@ -33,12 +33,13 @@ def login():
         user_name = user["given_name"]
     else:
         return "User email not available or not verified by Google.", 400
-    current_user = Author.query.filter_by(email=user_email).all()
+    current_user = Author.query.filter_by(email=user_email).first()
     if not current_user:
         new_author = Author(username=user_name, email=user_email, avatar=picture)
         db.session.add(new_author)
         db.session.commit()
-    return jsonify(user), 200
+        current_user = Author.query.filter_by(email=user_email).first()
+    return jsonify(current_user), 200
 
 
 # get query params based questions or all questions
