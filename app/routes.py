@@ -21,8 +21,8 @@ def login():
     request_body = request.get_json()
     token = request_body["token"]
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
-    request = requests.Request()
-    user = id_token.verify_oauth2_token(token,request,GOOGLE_CLIENT_ID)
+    r = requests.Request()
+    user = id_token.verify_oauth2_token(token,r,GOOGLE_CLIENT_ID)
     print('~~~~~')
     print(user)
     # session['user'] = user
