@@ -22,6 +22,14 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
         "SQLALCHEMY_DATABASE_URI")
     
+    app.config.update(
+        DEBUG=True,
+        SECRET_KEY=os.environ.get("GOOGLE_CLIENT_SECRET"),
+        SESSION_COOKIE_HTTPONLY=True,
+        REMEMBER_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Strict",
+    )
+    
     # app.secret_key = '!secret'
     # app.config.from_object('config')
 

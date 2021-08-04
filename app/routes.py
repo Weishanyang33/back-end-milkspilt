@@ -23,9 +23,6 @@ def login():
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     r = requests.Request()
     user = id_token.verify_oauth2_token(token,r,GOOGLE_CLIENT_ID)
-    print('~~~~~')
-    print(user)
-    # session['user'] = user
     if user["email_verified"]:
         user_id = user["sub"]
         user_email = user["email"]
@@ -39,9 +36,21 @@ def login():
         db.session.add(new_author)
         db.session.commit()
         current_user = Author.query.filter_by(email=user_email).first()
+    session['user_id'] = current_user.author_id
+    print(session)
     return {
             "current_user": current_user.to_json()
         }, 201
+    
+@login_bp.route("/logout", methods=["DELETE"], strict_slashes=False)
+def logout():
+    session.clear()
+    print(session)
+    return {
+        "message": "Logged out successfully"
+    }, 200
+    
+
 
 
 # get query params based questions or all questions
