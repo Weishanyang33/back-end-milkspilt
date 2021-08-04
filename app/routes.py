@@ -14,6 +14,7 @@ load_dotenv()
 
 ####################### Blueprints ########################
 questions_bp = Blueprint("questions", __name__, url_prefix="/questions")
+answers_bp = Blueprint("answers", __name__, url_prefix="/answers")
 login_bp = Blueprint("login", __name__)
 
 @login_bp.route("/login", methods=["POST"], strict_slashes=False)
@@ -37,7 +38,6 @@ def login():
         db.session.commit()
         current_user = Author.query.filter_by(email=user_email).first()
     session['user_id'] = current_user.author_id
-    print(session)
     return {
             "current_user": current_user.to_json()
         }, 201
@@ -45,14 +45,10 @@ def login():
 @login_bp.route("/logout", methods=["DELETE"], strict_slashes=False)
 def logout():
     session.clear()
-    print(session)
     return {
         "message": "Logged out successfully"
     }, 200
     
-
-
-
 # get query params based questions or all questions
 @questions_bp.route("", methods=["GET"], strict_slashes=False)
 def get_question():
@@ -71,7 +67,6 @@ def get_question():
         answers = Answer.query.filter_by(question_id=question.question_id).all()
         votes = Question_Vote.query.filter_by(question_id=question.question_id).all()
         answer_list = [answer.answer_id for answer in answers]
-        print(answer_list)
         vote_list = [vote for vote in votes]
         question_response.append(question.to_json(answer_list, vote_list))
     return jsonify(question_response), 200
@@ -133,7 +128,7 @@ def answer_question(question_id):
     else:
         return {"error": "Invalid data"}, 400
     
-
+# delete a question
 @questions_bp.route("/<question_id>", methods=["DELETE"], strict_slashes=False)
 def delete_question(question_id):
     question = Question.query.get(question_id)
@@ -146,6 +141,15 @@ def delete_question(question_id):
     return {
               "details": f"Question {question.question_id} {question.title} successfully deleted"
         }
+    
+# get an answer
+@answers_bp.route("/<answer_id>",methods=["GET"], strict_slashes=False)
+def get_answer(answer_id):
+    answer = Answer.query.get(answer_id)
+    if answer:
+        return jsonify(answer.to_json()),200
+    else:
+        return jsonify(None), 404
         
         
 

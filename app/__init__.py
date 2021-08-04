@@ -102,9 +102,11 @@ def create_app():
     migrate.init_app(app, db)
     
     from .routes import questions_bp
+    from .routes import answers_bp
     from .routes import login_bp
     
     app.register_blueprint(questions_bp)
+    app.register_blueprint(answers_bp)
     app.register_blueprint(login_bp)
     
     
