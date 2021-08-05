@@ -75,17 +75,16 @@ def get_question():
 @questions_bp.route("/<question_id>", methods=["GET"], strict_slashes=False)
 def get_one_question(question_id):
     question = Question.query.get(question_id)
+    if not question:
+        return {"error": "Question not exist"}, 404
     answers = Answer.query.filter_by(question_id=question_id).all()
     answer_list = [answer.answer_id for answer in answers]
     votes = Question_Vote.query.filter_by(question_id=question.question_id).all()
     vote_list = [vote.author_id for vote in votes]
-    if question:
-        question.views += 1
-        question_response = question.to_json_detail(answer_list, vote_list)
-        db.session.commit()
-        return jsonify(question_response), 200
-    else:
-        return {"error": "Question not exist"}, 404
+    question.views += 1
+    question_response = question.to_json_detail(answer_list, vote_list)
+    db.session.commit()
+    return jsonify(question_response), 200
 
 # post a question
 @questions_bp.route("", methods=["POST"], strict_slashes=False)
