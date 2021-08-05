@@ -85,7 +85,7 @@ def get_one_question(question_id):
         db.session.commit()
         return jsonify(question_response), 200
     else:
-        return jsonify(None), 404
+        return {"error": "Question not exist"}, 404
 
 # post a question
 @questions_bp.route("", methods=["POST"], strict_slashes=False)
