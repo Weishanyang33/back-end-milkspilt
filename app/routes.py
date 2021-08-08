@@ -16,6 +16,7 @@ load_dotenv()
 questions_bp = Blueprint("questions", __name__, url_prefix="/questions")
 answers_bp = Blueprint("answers", __name__, url_prefix="/answers")
 login_bp = Blueprint("login", __name__)
+authors_bp = Blueprint("authors", __name__, url_prefix="/authors")
 
 @login_bp.route("/login", methods=["POST"], strict_slashes=False)
 def login():
@@ -166,6 +167,13 @@ def get_answers():
         answer_response = [answer.to_json() for answer in answers]
     return jsonify(answer_response), 200
     
+@authors_bp.route("/<author_id>",methods=["GET"], strict_slashes=False)
+def get_one_author(author_id):
+    author = Author.query.get(author_id)
+    if author:
+        return jsonify(author.to_json(),200)
+    else:
+        return jsonify(None), 404
         
 
         
