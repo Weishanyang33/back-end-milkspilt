@@ -91,7 +91,7 @@ def get_one_question(question_id):
 def ask_question():
     # current_user = session['user']
     request_body = request.get_json()
-    if all(request_body[key].strip for key in ("title", "content", "age_tag", "cat_tag")):
+    if all(request_body[key].strip() for key in ("title", "content", "age_tag", "cat_tag")):
         new_question = Question(title=request_body["title"],
                                 content=request_body["content"],
                                 age_tag=request_body["age_tag"],
@@ -103,7 +103,7 @@ def ask_question():
                 "question": new_question.to_dict()
         }, 201
     else:
-        return {"error": "Invalid data"}, 400
+        return {"error": "Please include all the information needed to post a question."}, 400
 
 # answer a question   
 @questions_bp.route("/<question_id>/answer", methods=["POST"], strict_slashes=False)
