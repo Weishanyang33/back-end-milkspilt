@@ -91,7 +91,7 @@ def get_one_question(question_id):
 def ask_question():
     # current_user = session['user']
     request_body = request.get_json()
-    if all(key in request_body for key in ("title", "content", "age_tag", "cat_tag")):
+    if all(request_body[key].strip for key in ("title", "content", "age_tag", "cat_tag")):
         new_question = Question(title=request_body["title"],
                                 content=request_body["content"],
                                 age_tag=request_body["age_tag"],
@@ -115,7 +115,7 @@ def answer_question(question_id):
             "error": 'Question doesn\'t exist'
         }), 404
     request_body = request.get_json()
-    if "content" in request_body:
+    if request_body["content"].strip():
         new_answer = Answer(content=request_body["content"],
                             question_id=question_id,
                             author_id=request_body["author_id"])
@@ -143,12 +143,31 @@ def delete_question(question_id):
     
 # get an answer
 @answers_bp.route("/<answer_id>",methods=["GET"], strict_slashes=False)
-def get_answer(answer_id):
+def get_one_answer(answer_id):
     answer = Answer.query.get(answer_id)
     if answer:
         return jsonify(answer.to_json()),200
     else:
         return jsonify(None), 404
+
+# get all answers or a list of answers 
+@answers_bp.route("",methods=["GET"], strict_slashes=False)
+def get_answers():
+    params = request.args.get("params")
+    answer_response = []
+    if params:
+        for param in params:
+            if param.isnumeric():
+                answer = Answer.query.get(param)
+                print(answer)
+                answer_response.append(answer.to_json())
+    else:
+        answers = Answer.query.all()
+        answer_response = [answer.to_json() for answer in answers]
+    return jsonify(answer_response), 200
+    
+        
+
         
         
 
