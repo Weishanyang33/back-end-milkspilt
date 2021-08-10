@@ -129,7 +129,9 @@ def answer_question(question_id):
     if request_body["content"].strip():
         new_answer = Answer(content=request_body["content"],
                             question_id=question_id,
-                            author_id=request_body["author_id"])
+                            author_id=request_body["author_id"],
+                            username=request_body["username"],
+                            avatar=request_body["avatar"])
         db.session.add(new_answer)
         db.session.commit()
         return {
