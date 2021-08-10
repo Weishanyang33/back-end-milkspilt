@@ -7,6 +7,8 @@ class Answer(db.Model):
     date_answered = db.Column(db.DateTime, nullable=True, default=datetime.utcnow())
     author_id = db.Column(db.Integer, db.ForeignKey('author.author_id'))
     question_id = db.Column(db.Integer, db.ForeignKey('question.question_id'))
+    username = db.Column(db.String)
+    avatar = db.Column(db.String)
     
     def to_json(self):
         return {
@@ -14,5 +16,7 @@ class Answer(db.Model):
             "content": self.content,
             "date_answered": self.date_answered,
             "author_id": self.author_id,
-            "question_id": self.question_id
+            "question_id": self.question_id,
+            "username": self.username,
+            "avatar": self.avatar
         }

@@ -10,6 +10,8 @@ class Question(db.Model):
     views = db.Column(db.Integer, default=0)
     date_asked = db.Column(db.DateTime, nullable=True, default=datetime.utcnow())
     author_id = db.Column(db.Integer, db.ForeignKey('author.author_id'))
+    username = db.Column(db.String)
+    avatar = db.Column(db.String)
     answers = db.relationship('Answer', backref='question', lazy='dynamic')
     question_votes = db.relationship('Question_Vote', backref = 'question', lazy = 'dynamic')
     
@@ -23,7 +25,9 @@ class Question(db.Model):
             "age": self.age_tag,
             "category": self.cat_tag,
             "views": self.views,
-            "date_asked": self.date_asked
+            "date_asked": self.date_asked,
+            "username": self.username,
+            "avatar": self.avatar
         }
         
     def to_json(self,answer,vote):
@@ -37,7 +41,9 @@ class Question(db.Model):
             "views": self.views,
             "date_asked": self.date_asked,
             "answer": len(answer),
-            "vote": len(vote)
+            "vote": len(vote),
+            "username": self.username,
+            "avatar": self.avatar
         }
         
     def to_json_detail(self,answer,vote):
@@ -51,5 +57,7 @@ class Question(db.Model):
             "views": self.views,
             "date_asked": self.date_asked,
             "answer": answer,
-            "vote": vote
+            "vote": vote,
+            "username": self.username,
+            "avatar": self.avatar
         }

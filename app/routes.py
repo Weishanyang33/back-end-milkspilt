@@ -39,6 +39,8 @@ def login():
         db.session.commit()
         current_user = Author.query.filter_by(email=user_email).first()
     session['user_id'] = current_user.author_id
+    session['user_name'] = current_user.username
+    session['user_avatar'] = current_user.avatar
     return {
             "current_user": current_user.to_json()
         }, 201
@@ -93,11 +95,19 @@ def ask_question():
     # current_user = session['user']
     request_body = request.get_json()
     if all(request_body[key].strip() for key in ("title", "content", "age_tag", "cat_tag")):
+        # new_question = Question(title=request_body["title"],
+        #                         content=request_body["content"],
+        #                         age_tag=request_body["age_tag"],
+        #                         cat_tag=request_body["cat_tag"],
+        #                         author_id=request_body["author_id"])
         new_question = Question(title=request_body["title"],
                                 content=request_body["content"],
                                 age_tag=request_body["age_tag"],
                                 cat_tag=request_body["cat_tag"],
-                                author_id=request_body["author_id"])
+                                author_id=request_body["author_id"],
+                                username=request_body["username"],
+                                avatar=request_body["avatar"]
+                                )
         db.session.add(new_question)
         db.session.commit()
         return {
@@ -156,17 +166,19 @@ def get_one_answer(answer_id):
 def get_answers():
     params = request.args.get("params")
     answer_response = []
-    if params:
-        for param in params:
+    if params and len(params) != 0:
+        for param in params.split(','):
             if param.isnumeric():
                 answer = Answer.query.get(param)
-                print(answer)
                 answer_response.append(answer.to_json())
+    elif len(params) == 0:
+        answer_response = []
     else:
         answers = Answer.query.all()
         answer_response = [answer.to_json() for answer in answers]
     return jsonify(answer_response), 200
-    
+   
+# get one author information 
 @authors_bp.route("/<author_id>",methods=["GET"], strict_slashes=False)
 def get_one_author(author_id):
     author = Author.query.get(author_id)
