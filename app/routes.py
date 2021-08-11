@@ -52,6 +52,28 @@ def logout():
         "message": "Logged out successfully"
     }, 200
     
+# search
+@login_bp.route("/search", methods=["POST"], strict_slashes=False)
+def search():
+    request_body = request.get_json()
+    search_value = request_body["search_str"]
+    search = f"%{search_value}%"
+    search_results = Question.query.filter(Question.content.like(search)).all()
+    print(search_results)
+    if search_results:
+        search_response = []
+        for question in search_results:
+            answers = Answer.query.filter_by(question_id=question.question_id).all()
+            votes = Question_Vote.query.filter_by(question_id=question.question_id).all()
+            answer_list = [answer.answer_id for answer in answers]
+            vote_list = [vote for vote in votes]
+            search_response.append(question.to_json(answer_list, vote_list))
+        return jsonify(search_response), 200
+    return jsonify({
+            "error": 'No match found!'
+        }), 404
+    
+    
 # get query params based questions or all questions
 @questions_bp.route("", methods=["GET"], strict_slashes=False)
 def get_question():
@@ -95,11 +117,6 @@ def ask_question():
     # current_user = session['user']
     request_body = request.get_json()
     if all(request_body[key].strip() for key in ("title", "content", "age_tag", "cat_tag")):
-        # new_question = Question(title=request_body["title"],
-        #                         content=request_body["content"],
-        #                         age_tag=request_body["age_tag"],
-        #                         cat_tag=request_body["cat_tag"],
-        #                         author_id=request_body["author_id"])
         new_question = Question(title=request_body["title"],
                                 content=request_body["content"],
                                 age_tag=request_body["age_tag"],
