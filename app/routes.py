@@ -58,8 +58,7 @@ def search():
     request_body = request.get_json()
     search_value = request_body["search_str"]
     search = f"%{search_value}%"
-    search_results = Question.query.filter(Question.content.like(search)).all()
-    print(search_results)
+    search_results = Question.query.filter(Question.content.like(search) or Question.title.like(search)).all()
     if search_results:
         search_response = []
         for question in search_results:
@@ -170,6 +169,23 @@ def delete_question(question_id):
     return {
               "details": f"Question {question.question_id} {question.title} successfully deleted"
         }
+    
+# vote a question
+@questions_bp.route("/<question_id>/vote", methods=["POST"], strict_slashes=False)
+def vote_question(question_id):
+    question = Question.query.get(question_id)
+    if not question:
+        return jsonify({
+            "error": 'Question doesn\'t exist'
+        }), 404
+    request_body = request.get_json()
+    new_vote = Question_Vote(question_id=question_id, author_id=request_body["author_id"])
+    db.session.add(new_vote)
+    db.session.commit()
+    return {
+            "vote": new_vote.to_json()
+    }, 201
+    
     
 # get an answer
 @answers_bp.route("/<answer_id>",methods=["GET"], strict_slashes=False)
