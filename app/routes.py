@@ -58,7 +58,7 @@ def search():
     request_body = request.get_json()
     search_value = request_body["search_str"]
     search = f"%{search_value}%"
-    search_results = Question.query.filter(Question.content.like(search) or Question.title.like(search)).all()
+    search_results = Question.query.filter(Question.content.like(search)).all()
     if search_results:
         search_response = []
         for question in search_results:
