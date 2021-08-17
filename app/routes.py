@@ -207,7 +207,7 @@ def get_answers():
             if param.isnumeric():
                 answer = Answer.query.get(param)
                 answer_response.append(answer.to_json())
-    elif params and len(params) == 0:
+    elif len(params) == 0:
         answer_response = []
     else:
         answers = Answer.query.all()
