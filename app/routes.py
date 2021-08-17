@@ -142,6 +142,8 @@ def answer_question(question_id):
             "error": 'Question doesn\'t exist'
         }), 404
     request_body = request.get_json()
+    if not request_body["author_id"]:
+        return {"error": "Please log in first."}, 400
     if request_body["content"].strip():
         new_answer = Answer(content=request_body["content"],
                             question_id=question_id,
@@ -154,7 +156,7 @@ def answer_question(question_id):
                 "answer": new_answer.to_json()
         }, 201
     else:
-        return {"error": "Invalid data"}, 400
+        return {"error": "Couldn't submit the answer, please leave something here."}, 400
     
 # delete a question
 @questions_bp.route("/<question_id>", methods=["DELETE"], strict_slashes=False)
