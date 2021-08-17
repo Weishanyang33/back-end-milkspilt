@@ -187,8 +187,7 @@ def vote_question(question_id):
     return {
             "vote": new_vote.to_json()
     }, 201
-    
-    
+     
 # get an answer
 @answers_bp.route("/<answer_id>",methods=["GET"], strict_slashes=False)
 def get_one_answer(answer_id):
@@ -208,12 +207,26 @@ def get_answers():
             if param.isnumeric():
                 answer = Answer.query.get(param)
                 answer_response.append(answer.to_json())
-    elif len(params) == 0:
+    elif params and len(params) == 0:
         answer_response = []
     else:
         answers = Answer.query.all()
         answer_response = [answer.to_json() for answer in answers]
     return jsonify(answer_response), 200
+
+# delete answer
+@answers_bp.route("/<answer_id>",methods=["DELETE"], strict_slashes=False)
+def delete_answer(answer_id):
+    answer = Answer.query.get(answer_id)
+    if not answer:
+        return jsonify({
+            "error": 'Answer doesn\'t exist'
+        }), 404
+    db.session.delete(answer)
+    db.session.commit()
+    return {
+              "details": f"Answer {answer.answer_id} successfully deleted"
+    }
    
 # get one author information 
 @authors_bp.route("/<author_id>",methods=["GET"], strict_slashes=False)
@@ -223,6 +236,8 @@ def get_one_author(author_id):
         return jsonify(author.to_json(),200)
     else:
         return jsonify(None), 404
+    
+
         
 
         
